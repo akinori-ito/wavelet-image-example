@@ -86,35 +86,35 @@ MyPPM_read(char *file)
   /* read type */
   if (MyPPM_readline(buffer,MyPPM_BSIZE,f) == NULL)
     return NULL;
-  if (strcmp(buffer,"P2¥n") == 0)
+  if (strcmp(buffer,"P2\n") == 0)
     ppm->format = FORMAT_PGM;
-  else if (strcmp(buffer,"P3¥n") == 0)
+  else if (strcmp(buffer,"P3\n") == 0)
     ppm->format = FORMAT_PPM;
-  else if (strcmp(buffer,"P5¥n") == 0)
+  else if (strcmp(buffer,"P5\n") == 0)
     ppm->format = FORMAT_PGMRAW;
-  else if (strcmp(buffer,"P6¥n") == 0)
+  else if (strcmp(buffer,"P6\n") == 0)
     ppm->format = FORMAT_PPMRAW;
   else {
-    fprintf(stderr,"PPM format mismatch¥n");
+    fprintf(stderr,"PPM format mismatch\n");
     return NULL;
   }
   /* read width&height */
   for (;;) {
     if (MyPPM_readline(buffer,MyPPM_BSIZE,f) == NULL)
       return NULL;
-    if (buffer[0] == '¥n' || buffer[0] == '#')
+    if (buffer[0] == '\n' || buffer[0] == '#')
       continue;
     break;
   }
   if (sscanf(buffer,"%d%d",&ppm->width,&ppm->height) != 2) {
-    fprintf(stderr,"PPM size bad¥n");
+    fprintf(stderr,"PPM size bad\n");
     return NULL;
   }
   /* read depth */
   if (MyPPM_readline(buffer,MyPPM_BSIZE,f) == NULL)
     return NULL;
-  if (strcmp(buffer,"255¥n") != 0) {
-    fprintf(stderr,"PPM depth unsupported¥n");
+  if (strcmp(buffer,"255\n") != 0) {
+    fprintf(stderr,"PPM depth unsupported\n");
     return NULL;
   }
   ppm->data = malloc(ppm->width*ppm->height*3);
@@ -159,18 +159,18 @@ MyPPM_write(struct myppm *ppm, char *file)
 
   if ((f = fopen(file,"wb")) == NULL)
     return NULL;
-  fprintf(f,"P%d¥n",ppm->format);
-  fprintf(f,"%d %d¥n",ppm->width,ppm->height);
-  fprintf(f,"255¥n");
+  fprintf(f,"P%d\n",ppm->format);
+  fprintf(f,"%d %d\n",ppm->width,ppm->height);
+  fprintf(f,"255\n");
   for (y = 0; y < ppm->height; y++) {
     for (x = 0; x < ppm->width; x++) {
       switch (ppm->format) {
       case FORMAT_PGM:
-	fprintf(f,"%d¥n",MyPPM_point(ppm,x,y)[0]);
+	fprintf(f,"%d\n",MyPPM_point(ppm,x,y)[0]);
 	break;
       case FORMAT_PPM:
 	for (i = 0; i < 3; i++) {
-	  fprintf(f,"%d¥n",MyPPM_point(ppm,x,y)[i]);
+	  fprintf(f,"%d\n",MyPPM_point(ppm,x,y)[i]);
 	}
 	break;
       case FORMAT_PGMRAW:
@@ -279,8 +279,8 @@ do_compose(struct myppm *ppm,int width, int height)
 	p = MyPPM_point(ppm2,x,y)[i];
 	p2 = UNBIAS(MyPPM_point(ppm2,x,y+half)[i]);
 #if 0
-	if (p+p2 < 0 || 255< p+p2) {printf("P(%d,%d)=%d¥n",x,2*y,p+p2);}
-	if (p-p2 < 0 || 255< p-p2) {printf("P(%d,%d)=%d¥n",x,2*y+1,p-p2);}
+	if (p+p2 < 0 || 255< p+p2) {printf("P(%d,%d)=%d\n",x,2*y,p+p2);}
+	if (p-p2 < 0 || 255< p-p2) {printf("P(%d,%d)=%d\n",x,2*y+1,p-p2);}
 #endif
 	/* Haar */
 	MyPPM_point(ppm,x,2*y)[i] = LIMIT_BYTE(p+p2);
@@ -294,7 +294,7 @@ do_compose(struct myppm *ppm,int width, int height)
 void
 usage()
 {
-  fprintf(stderr,"usage: proc_w [-compose] [-level n] infile outfile¥n");
+  fprintf(stderr,"usage: proc_w [-compose] [-level n] infile outfile\n");
   exit(1);
 }
 
@@ -324,7 +324,7 @@ main(int argc, char *argv[])
 
   ppm = MyPPM_read(infile);
   if (ppm == NULL) {
-    fprintf(stderr,"Can't open %s¥n",infile);
+    fprintf(stderr,"Can't open %s\n",infile);
     return 1;
   }
   width = ppm->width;
@@ -345,7 +345,7 @@ main(int argc, char *argv[])
     }
   }
   if (MyPPM_write(ppm,outfile) == NULL) {
-    fprintf(stderr,"Can't open %s¥n",outfile);
+    fprintf(stderr,"Can't open %s\n",outfile);
     return 1;
   }
   return 0;
